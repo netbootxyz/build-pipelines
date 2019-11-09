@@ -22,7 +22,7 @@ if [ "${TYPE}" == "compare" ]; then
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
-    travis_terminate 0
+    exit 1
   fi
 fi
 
