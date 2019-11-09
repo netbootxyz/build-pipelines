@@ -51,7 +51,7 @@ if [ "${TYPE}" == "endpoints" ]; then
   git checkout -f development
   cp ../templateout/merged.yml endpoints.yml
   git add endpoints.yml
-  git commit -m "Version bump for ${GITHUB_ENDPOIN}:${BRANCH} new tag ${ARG}"
+  git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
   git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
 fi
 
