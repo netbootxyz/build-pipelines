@@ -64,7 +64,7 @@ if [ "${TYPE}" == "discord" ]; then
       "embeds": [
         {
           "color": 1681177,
-          "description": "__**New Asset Published**__ \n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+          "description": "__**New Asset Published**__ \n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
         }
       ],
       "username": "Travis CI"
