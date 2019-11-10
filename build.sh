@@ -49,6 +49,8 @@ if [ "${TYPE}" == "endpoints" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git remote
   cd remote
   git checkout -f development
+  cp endpoints.yml ../templateout/
+  docker run --rm -it -e RELEASE_TAG=${ARG} -v $(pwd)/../templateout:/buildout netbootxyz/yaml-merge
   cp ../templateout/merged.yml endpoints.yml
   git add endpoints.yml
   git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
