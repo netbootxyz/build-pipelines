@@ -12,10 +12,7 @@ ARG="$2"
 
 # compare external endpoints file to this one after being tagged
 if [ "${TYPE}" == "compare" ]; then
-  mkdir -p templateout
-  curl -fsL -o endpoints.yml -L \
-    https://raw.githubusercontent.com/netbootxyz/netboot.xyz/development/endpoints.yml
-  cp endpoints.yml templateout/
+  git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
   cp endpoints.template templateout/
   docker run --rm -it -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout netbootxyz/yaml-merge
   CURRENTHASH=$(md5sum endpoints.yml | cut -c1-8)
@@ -50,7 +47,7 @@ if [ "${TYPE}" == "endpoints" ]; then
   cd remote
   git checkout -f development
   cp endpoints.yml ../templateout/
-  docker run --rm -it -e RELEASE_TAG=${ARG} -v $(pwd)/../templateout:/buildout netbootxyz/yaml-merge
+  docker run --rm -it -e RELEASE_TAG="NULL" -v $(pwd)/../templateout:/buildout netbootxyz/yaml-merge
   cp ../templateout/merged.yml endpoints.yml
   git add endpoints.yml
   git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
