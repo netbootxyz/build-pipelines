@@ -15,7 +15,7 @@ if [ "${TYPE}" == "compare" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
   cp endpoints.template templateout/
   docker run --rm -it -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout netbootxyz/yaml-merge
-  CURRENTHASH=$(md5sum endpoints.yml | cut -c1-8)
+  CURRENTHASH=$(md5sum templateout/endpoints.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
