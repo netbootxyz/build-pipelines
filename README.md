@@ -1,4 +1,20 @@
-# NETBOOT.XYZ Build Environment
+- [NETBOOT.XYZ Build Environment](#netbootxyz-build-environment)
+  * [Intro](#intro)
+  * [Templating NETBOOT.XYZ](#templating-netbootxyz)
+    + [Templating basics](#templating-basics)
+    + [Using the templates to self host](#using-the-templates-to-self-host)
+  * [Building HTTPS compatible Live CD components](#building-https-compatible-live-cd-components)
+    + [Asset publishing to Github releases](#asset-publishing-to-github-releases)
+      - [Daily builds to check for external version changes](#daily-builds-to-check-for-external-version-changes)
+      - [Static builds for non version tracked assets](#static-builds-for-non-version-tracked-assets)
+    + [Compatibility between standard init hooks and Github releases](#compatibility-between-standard-init-hooks-and-github-releases)
+      - [Ubuntu's Casper](#ubuntu-s-casper)
+      - [Debian's Live-Boot](#debian-s-live-boot)
+      - [Manjaro's miso hooks](#manjaro-s-miso-hooks)
+      - [Red Hat's Dracut](#red-hat-s-dracut)
+  * [Development workflow](#development-workflow)
+    + [Hosted fully functional build output](#hosted-fully-functional-build-output)
+    + [Continuous integration](#continuous-integration)
 
 ## Intro
 
@@ -8,12 +24,12 @@ The purpose of this repository is 2 parts:
 
 - Be an evolving written explanation of the current state of the automated build system spanning all of these externally ingested assets.
 
-Outside of these core principles this document should provide as much possible information on how to properly participate in the project as a whole.
+Outside of the core principles, this document should provide as much possible information on how to properly participate in the project as a whole.
 
 ## Templating NETBOOT.XYZ
 
 Our main visible output is https available customized IPXE Menu assets that can be easily consumed by a series of custom built IPXE boot mediums.
-The purpose of templating the menu output serves two purposes as it makes it possible for this project to be updated by bots reaching out for our own custom hosted assets and it also makes it possible for users to locally host their own customized menu/boot medium sets.
+We template the menu output for two reasons as it makes it possible for this project to be updated by bots reaching out for our own custom hosted assets and it also makes it possible for users to locally host their own customized menu/boot medium sets.
 To encapsilate all build steps and menu templating Ansible was selected as a platform using Jinja templates. 
 
 The build process should always strive to: 
@@ -23,7 +39,7 @@ The build process should always strive to:
 - Have documented tools the user can leverage to produce a copycat site of netboot.xyz under their own domain along with a method for consuming our releases
 - Allow users to easily pick and choose the components they want to be included in their menus and custom options to go along with them. 
 
-If we can adhere to these standards it should be possible to become an industry standard for booting Operating systems off the Internet instead of an isolated environment and garner support from external projects that want to be on the list presented to users by default.   
+If we can adhere to these goals it should be possible to become an industry standard for booting Operating systems off the Internet instead of an isolated environment and garner support from external projects that want to be on the list presented to users by default.   
 
 ### Templating basics
 
@@ -36,15 +52,42 @@ Out of everything that is hosted in these menus the contents of Live CDs we tear
 
 If a user has a need to boot these medium many times either in a local home setup or a full Enterprise enviroment we need to provide the tools to be able to easily mirror our build output and provide options to selectively download only what they choose to show in their menus.
 
-At the time of this writing the current menus for the project are a mix of legacy menus for publically available assets at HTTP/HTTPS endpoints 
+At the time of this writing the current menus for the project are a mix of legacy menus for publically available assets at HTTP/HTTPS endpoints and assets that we host ourselves out of Github. The legacy assets are difficult to self host as they would conventionally also require that the user syncs entire mirrors for that distribution. 
+The assets we host are a little more static and we specifically store their metadata in a format so they can be downloaded and kept up to date in a scripted manner by the end user if needed.
+
+These two pieces of data for every release can be used to construct URLs for download that will be 1:1 comaptible with our menus: 
+
+```
+    path: /ubuntu-core-18.04/releases/download/4.15.0.20.23-91c3d317/
+    files:
+    - initrd
+    - vmlinuz
+```
+
+Locally a user should be able to run logic we support for consistent ingestion covered in the [main projects documentation](https://github.com/netbootxyz/netboot.xyz), but below is a basic breakdown. 
+
+
+Given the metadata above the following commands will generate a folder structure and files needed: 
+
+```
+export DLPATH="/ubuntu-core-18.04/releases/download/4.15.0.20.23-91c3d317/"
+export DLURL="https://github.com/netbootxyz$DLPATH"
+mkdir -p .$DLPATH
+wget -O ."$DLPATH"initrd "$DLURL"initrd
+wget -O ."$DLPATH"vmlinuz "$DLURL"vmlinuz
+```
+
+The resulting folder structure can be hosted with Apache, NGINX, or any other webserver and the user can modify the `live_endpoint` in their `boot.cfg` which defaults to `https://github.com/netbootxyz` to their webserver and serve them locally.
+
+This method of self hosting also assumes that the user is either custom building the boot medium and menu files from a webserver or they are serving the IPXE files from TFPT. 
 
 ## Building HTTPS compatible Live CD components
 
-What a user would conventionally consider a Live CD is made up of 3 main components we need to boot the operating system over the internet: 
+What a user would conventionally consider a Live CD is made up of 3 main components we need to boot the operating system over the Internet: 
 
 - Kernel - This is the Linux Kernel, the main program loaded to communicate with the underlying hardware in the computer. 
 
-- Initramfs - What you would consider a pre-boot environment the Kernel will execute an init process using the contents of this file.
+- Initramfs - What you would consider a pre-boot environment, the Kernel will execute an init process using the contents of this file.
 
 - SquashFS - This is the main operating system that the user cares about booting into. 
 
@@ -91,14 +134,13 @@ You will notice this file contains a keyword `REPLACE_RELEASE_NAME` this allows 
 https://github.com/netbootxyz/netboot.xyz/blob/development/endpoints.yml
 This list of metadata allows us to generate boot menu releases with every incremental change to the underlying assets they point to in Github.  
 
-These will also contain a settings.sh file that is used by the helper 
 
 Asset repos fall into two main categories for us from a build pipeline perspective.
 
 #### Daily builds to check for external version changes
 
 These types of builds are not limited to but conventionally will be tied to what distributions consider `stable` releases. These releases will have a minor version number. Ubuntu for example has a current stable release of Ubuntu 18.04 Bionic Beaver, but the live CD is currently versioned at 18.04.3, we as an organization do not want to keep track of this kind of stuff. 
-Our assumption will always be that the end Users want to boot the latest minor versions and we should not be hosting old minor versions unless there are very specific reasons. 
+Our assumption will always be that the end users want to boot the latest minor versions and we should not be hosting old minor versions unless there are very specific reasons. 
 
 These builds need to be able to be run daily and handle failure to retrieve the current external version for the releases. Meaning if they get a null response back the null version number should not allow a successful build as a protection from publishing empty/corrupt releases.
 
@@ -205,21 +247,23 @@ All that Manjaro requires is slight code changes to support 302 redirects as the
 From 30,000 feet up we as an organization will take our own internal bot commits along with general development and create a snapshot of the rolling release to test in a release canidate. 
 These RC endpoints should be generally acceptable for a normal user to consume as long as they understand they might run into bugs and need to report them to us. 
 Both the RC and main release should contain the same changelog with the squashed commit messages that went into that since the last stable release. 
-Development will also produce a `latest` style consumable endpoint but this should only ever be used for testing and will never be officially supported. 
 
 This section only applies to our main project that outputs menu and bootable asset files. The asset repos will generally be managed strictly by NETBOOT.XYZ team members and have a less restrictive workflow.
 
 ### Hosted fully functional build output
 
-Every time a change is made we need to take that incremental change and create useable output hosted in S3.
+Every time a change is made we need to take that incremental change and create useable output hosted in S3 so we know with certainty that it functions before pushing it to our main domain and innevidibly to downstream users domains/local environments. 
+To achieve this we build and push every commit to our development branch and push the boot medium along with the menu files at that commit off to a specific subfolder based on it's commit sha. 
+At build time this boot medium is statically pointed to this S3 folder so they will always point those specific menus at that commit and can be regression tested. 
 
-Commits to development should push their menus/boot files to S3 in a subfolder based off of the commit SHA. 
+Outside of rolling development output we also want to version control our release canidates and production releases. Unlike the development releases these version controlled releases can be accessed at a latest style endpoint:
 
-Pull requests should produce the same style output, but it should also ping back into the PR the link to it all so the people participating have something to test. 
+- https://boot.netboot.xyz - for production
+- https://boot.netboot.xyz/rc - for release canidates
 
-**EXPAND SECTION WITH LAYOUT FOR LINKING TO THESE BUILDS AND METHODS FOR MAKING SURE WE CHECK THEM OUT** 
+To access a specific version for example though you would use it's version number IE `https://boot.netboot.xyz/1.05` these endpoints will host menu files and boot medium to use to access them from a client. 
 
-### Continuous integration
+### Continuous integration WIP
 
 **THIS IS ALL THEORY NOW BUT SOME LOCAL TESTS HAVE BEEN RUN**
 Every build possible should publish a web page we are able to click on containing: 
