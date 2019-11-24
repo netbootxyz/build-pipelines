@@ -57,7 +57,7 @@ fi
 # send status to discord
 if [ "${TYPE}" == "discord" ]; then
   if [ "${ARG}" == "success" ]; then
-    curl -X POST --data \
+    curl -X POST -H "Content-Type: application/json" --data \
     '{
       "avatar_url": "https://avatars.io/twitter/travisci",
       "embeds": [
@@ -70,7 +70,7 @@ if [ "${TYPE}" == "discord" ]; then
     }' \
     ${DISCORD_HOOK_URL}
   elif [ "${ARG}" == "failure" ]; then
-    curl -X POST --data \
+    curl -X POST -H "Content-Type: application/json" --data \
     '{
       "avatar_url": "https://avatars.io/twitter/travisci",
       "embeds": [
