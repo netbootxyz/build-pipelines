@@ -35,6 +35,17 @@ if [ "${TYPE}" == "build" ]; then
     docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t kernel .
     mkdir -p buildout
     docker run --rm -it -v $(pwd)/buildout:/buildout kernel
+  elif [ "${ARG}" == "initrd_patch" ]; then
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
+    mkdir -p buildout
+    cp settings.sh buildout/settings.sh
+    docker run --rm -it -v $(pwd)/buildout:/buildout netbootxyz/iso-processor
+    docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
+    docker run --rm -it -v $(pwd)/buildout:/buildout files
+    mv buildout buildin
+    mkdir -p buildout
+    cp settings.sh buildout/settings.sh
+    docker run --rm -it -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin netbootxyz/iso-processor
   else
     exit 1
   fi
