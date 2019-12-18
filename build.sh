@@ -40,7 +40,7 @@ if [ "${TYPE}" == "build" ]; then
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -it -v $(pwd)/buildout:/buildout netbootxyz/iso-processor
-    docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
+    sudo docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
     docker run --rm -it -v $(pwd)/buildout:/buildout files
     mv buildout buildin
     mkdir -p buildout
