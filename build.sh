@@ -46,6 +46,14 @@ if [ "${TYPE}" == "build" ]; then
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -it -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin netbootxyz/iso-processor
+  elif [ "${ARG}" == "direct_file" ]; then
+    mkdir -p buildout
+    source settings.sh
+    while read -r DL; do
+      URL="${DL%|*}"
+      OUT="${DL#*|}"
+      curl -Lf "${URL}" -o buildout/"${OUT}"
+    done <<< "${DOWNLOADS}"
   else
     exit 1
   fi
