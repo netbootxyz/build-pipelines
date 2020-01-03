@@ -47,6 +47,7 @@ if [ "${TYPE}" == "build" ]; then
     cp settings.sh buildout/settings.sh
     docker run --rm -it -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin netbootxyz/iso-processor
   elif [ "${ARG}" == "direct_file" ]; then
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
     source settings.sh
     while read -r DL; do
