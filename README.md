@@ -343,7 +343,7 @@ The workflow is as follows:
 * User checks out `development`
 * User branches `development` to a feature branch
 * Feature branch Pull requests back into `development` must be approved by at least one team member (these will be built automatically by Travis)
-* Commits from development are merged into `rc` (these build and push to https://boot.netboot.xyz/rc) 
+* Commits from development are merged into `rc` (these build and push to https://staging.boot.netboot.xyz/rc/) 
 * On final release `rc` is merged into `master` (these build and push to https://boot.netboot.xyz/)
 
 This section only applies to our main project that outputs menu and bootable asset files. The asset repos will generally be managed strictly by NETBOOT.XYZ team members and have a less restrictive workflow.
@@ -357,7 +357,7 @@ At build time this boot medium is statically pointed to this S3 folder so they w
 Outside of rolling development output we also want to version control our release canidates and production releases. Unlike the development releases these version controlled releases can be accessed at a latest style endpoint:
 
 - https://boot.netboot.xyz - for production
-- https://boot.netboot.xyz/rc - for release canidates
+- https://staging.boot.netboot.xyz/rc/ - for release canidates
 
 To access a specific version for example though you would use it's version number IE `https://boot.netboot.xyz/1.05` these endpoints will host menu files and boot medium to use to access them from a client. 
 
