@@ -43,7 +43,92 @@ If we can adhere to these goals it should be possible to become an industry stan
 
 ### Templating basics
 
-NEEDS EXPANSION TO EXPLAIN JINJA TEMPLATING RULES FOR PROJECT
+Templates for boot menus should try to utilize centralized variables from defaults or our rolling list of endpoints. This allows users to easily set customizations from a `user_overrides.yml` file when they build locally and for bot commits. 
+
+#### Loop through everything
+
+In general build time optimizations when it comes to templating are not a huge priority. In order to pull out values you want in an ordered list it will sometimes be necesarry to loop through all of the assets available IE for Ubuntu Live CDs: 
+
+```
+{% for key, value in endpoints.items() | sort %}
+{% if value.os == "ubuntu" and 'squash' in key and value.version == "18.04" %}
+item {{ key }} ${space} {{ value.os | title }} {{ value.version }} {{ value.flavor | title}}
+{% endif %}
+{% endfor %}
+```
+
+The loop above is used to extract the different Flavor tags for all Ubuntu 18.04 distros which outputs : 
+
+```
+item ubuntu-18.04-Budgie-squash ${space} Ubuntu 18.04 Budgie
+item ubuntu-18.04-KDE-squash ${space} Ubuntu 18.04 Kde
+item ubuntu-18.04-LXDE-squash ${space} Ubuntu 18.04 Lxde
+item ubuntu-18.04-MATE-squash ${space} Ubuntu 18.04 Mate
+item ubuntu-18.04-default-squash ${space} Ubuntu 18.04 Gnome
+item ubuntu-18.04-kylin-squash ${space} Ubuntu 18.04 Kylin
+item ubuntu-18.04-xfce-squash ${space} Ubuntu 18.04 Xfce
+```
+
+By performing loops like this flavors can be added in the future to our asset list without making modifcations to the core template. 
+
+#### YAML when possible
+
+When templating the way to bake in user overide ability with minimal effort from users is to store variables in the `defaults/main.yml` file. 
+For example looking at OpenBSD:
+
+```
+  openbsd:
+    name: "OpenBSD"
+    mirror: "http://ftp.openbsd.org"
+    base_dir: "pub/OpenBSD"
+    enabled: true
+    menu: "bsd"
+    versions:
+      - name: "6.6"
+        code_name: "6.6"
+        image_ver: "66"
+      - name: "6.5"
+        code_name: "6.5"
+        image_ver: "65"
+      - name: "6.4"
+        code_name: "6.4"
+        image_ver: "64"
+      - name: "6.3"
+        code_name: "6.3"
+        image_ver: "63"
+      - name: "6.6 Latest Snapshot"
+        code_name: "snapshots"
+        image_ver: "66"
+```
+
+These variables are ingesting for not only enabling the menu entry linking to the file: 
+
+```
+{% for key, value in releases.items() | sort(attribute='1.name') %}
+{% if value.enabled is defined and value.menu == "bsd" and value.enabled | bool %}
+item {{ key }} ${space} {{ value.name }}
+{% endif %}
+{% endfor %}
+```
+
+Then to ingest the array set in the main YAML file: 
+
+```
+{% for item in releases.openbsd.versions %}
+item {{ item.code_name }} ${space} ${os} {{ item.name }}
+{% endfor %}
+```
+
+If a user wants to prune this completely from their custom built menu or just add/remove specific versions that can do that with a simple `user_overrides.yml` entry:
+
+```
+  openbsd:
+    name: "OpenBSD"
+    mirror: "http://ftp.openbsd.org"
+    base_dir: "pub/OpenBSD"
+    enabled: false
+    menu: "bsd"
+```
 
 ### Using the templates to self host
 
@@ -231,22 +316,35 @@ Also again here [the code in the Kernel building repos](https://github.com/netbo
 
 Manjaro is Arch based but they maintain their own specific pre-init hooks located [here](https://gitlab.manjaro.org/tools/development-tools/manjaro-tools/tree/master/initcpio/hooks) . 
 
-All that Manjaro requires is slight code changes to support 302 redirects as they use a series of squashfs files and ping the webserver for all of them and will only download and mount on a `200 OK` response which Github lacks.
+All that Manjaro requires is slight code changes to support 302 redirects as they use a series of squashfs files and ping the webserver for all of them and will only download and mount on a `200 OK` response which Github lacks we do this in a sed replacement so we do not need to maintain patches on upstream changes:
 
-**EXPAND THIS WHEN WE FIGURE OUT WHY MISO HANGS ON INITIAL SSL NEGOTIATION**
+```
+ sed -i \
+	-e 's/${misobasedir}\/${arch}//g' \
+	-e 's/"OK"/"OK\\|302 Found"/g' \
+	/etc/initcpio/hooks/miso_pxe_http
+```
+
+For some unknown reason it hangs on the initial file download unless the user continuosly presses CTL+C and CTRL+D. 
 
 #### Red Hat's Dracut
 
-**WRITE WHEN WE DO FEDORA/REDHAT**
+There are many distros that use Dracut as a pre-init manager currently Fedora is the only one we host and provide live booting options for. 
 
+Fedora support redirects, SSL, and do not have files that need to be multiparted so no changes are needed. 
 
 ## Development workflow
-
-**ADD GRAPHIC HERE** ( should detail users contributing along with our bots contributing and how that makes it from development to a final release hosted out of netboot.xyz ) 
 
 From 30,000 feet up we as an organization will take our own internal bot commits along with general development and create a snapshot of the rolling release to test in a release canidate. 
 These RC endpoints should be generally acceptable for a normal user to consume as long as they understand they might run into bugs and need to report them to us. 
 Both the RC and main release should contain the same changelog with the squashed commit messages that went into that since the last stable release. 
+
+The workflow is as follows: 
+* User checks out `development`
+* User branches `development` to a feature branch
+* Feature branch Pull requests back into `development` must be approved by at least one team member (these will be built automatically by Travis)
+* Commits from development are merged into `rc` (these build and push to https://boot.netboot.xyz/rc) 
+* On final release `rc` is merged into `master` (these build and push to https://boot.netboot.xyz/)
 
 This section only applies to our main project that outputs menu and bootable asset files. The asset repos will generally be managed strictly by NETBOOT.XYZ team members and have a less restrictive workflow.
 
@@ -263,20 +361,14 @@ Outside of rolling development output we also want to version control our releas
 
 To access a specific version for example though you would use it's version number IE `https://boot.netboot.xyz/1.05` these endpoints will host menu files and boot medium to use to access them from a client. 
 
-### Continuous integration WIP
+### Continuous integration
 
-**THIS IS ALL THEORY NOW BUT SOME LOCAL TESTS HAVE BEEN RUN**
-Every build possible should publish a web page we are able to click on containing: 
+Currently all commits that come from Humans need to come in the form of a pull request to the Development branch and make their way up the chain to a release. 
 
-- A screenshot or animation of the IPXE boot rom loading and landing to the main menu **MIGHT BE ABLE TO DO THIS WITH QEMU/ASCIINEMA web players to capture serial output of the DHCP and bootstrap**
-- Clickable easy to read links to the different build assets for download
+For a pull request we: 
 
-Possible to fully emulate the IPXE kernel in jslinux ? https://bellard.org/jslinux/faq.html
-Can we do linting of any kind IPXE files do not look like they have any kind of public linting option ? 
+* Lint all ingested settings and templates with- `ansible-lint -v roles/netbootxyz`
+* Build the IPXE assets and templates with dummy values
 
-
-**SCREENSHOT HERE OF WORKING PAGE**
-
-Asset booting?? It should technically be possible if we maintain a boot snippet in every asset repo (possibly in the endpoints.template) . 
-Could have an IPXE booter linked to a VM stack that runs the VM for a period of time to allow the OS to load and takes a screenshot every X seconds and upload it all to S3 and ping it in to discord.
-Would need local x86 nodes for this, would never be possible with free infra. 
+Using travis due to the lack of secrets in commit PRs our options for pushing off reports outside of the build context in Travis is limited. 
+In the future if migrating to an alternative platform new options may open up. 
