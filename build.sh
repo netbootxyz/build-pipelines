@@ -55,11 +55,9 @@ if [ "${TYPE}" == "build" ]; then
       OUT="${DL#*|}"
       curl -Lf "${URL}" -o buildout/"${OUT}"
     done <<< "${DOWNLOADS}"
-    if [ -f "post-processing.sh" ]; then
-      bash post-processing.sh
-    fi
-  else
-    exit 1
+  fi
+  if [ -f "post-processing.sh" ]; then
+    sudo bash post-processing.sh
   fi
 fi
 
