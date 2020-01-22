@@ -31,6 +31,13 @@ if [ "${TYPE}" == "build" ]; then
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -it -v $(pwd)/buildout:/buildout netbootxyz/iso-processor
+  elif [ "${ARG}" == "initrd_layer" ]; then
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
+    mkdir -p buildout
+    cp settings.sh buildout/settings.sh
+    docker run --rm -it -v $(pwd)/buildout:/buildout netbootxyz/iso-processor
+    sudo docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
+    docker run --rm -it -v $(pwd)/buildout:/buildout files
   elif [ "${ARG}" == "custom_kernel" ]; then
     docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t kernel .
     mkdir -p buildout
