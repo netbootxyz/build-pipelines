@@ -27,8 +27,8 @@ fi
 if [ "${TYPE}" == "versioning" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
   cp releases.template templateout/
-  docker run --rm -it -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout netbootxyz/yaml-merge:external /buildout/roles/netboot.xyz/defaults/main.yml /buildout/releases.template
-  CURRENTHASH=$(md5sum templateout/roles/netboot.xyz/defaults/main.yml | cut -c1-8)
+  docker run --rm -it -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout netbootxyz/yaml-merge:external /buildout/roles/netbootxyz/defaults/main.yml /buildout/releases.template
+  CURRENTHASH=$(md5sum templateout/roles/netbootxyz/defaults/main.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
@@ -102,8 +102,8 @@ if [ "${TYPE}" == "releases" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git remote
   cd remote
   git checkout -f development
-  cp ../templateout/merged.yml roles/netboot.xyz/defaults/main.yml
-  git add roles/netboot.xyz/defaults/main.yml
+  cp ../templateout/merged.yml roles/netbootxyz/defaults/main.yml
+  git add roles/netbootxyz/defaults/main.yml
   git commit -m "External Version bump for ${BRANCH} new version string \"${ARG}\" "
   git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
   git rev-parse HEAD | cut -c1-8 > ../commit.txt
