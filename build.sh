@@ -23,6 +23,19 @@ if [ "${TYPE}" == "compare" ]; then
   fi
 fi
 
+# generate the releases file and compare it to the merged one in the main repo
+if [ "${TYPE}" == "versioning" ]; then
+  git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
+  cp releases.template templateout/
+  docker run --rm -it -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout netbootxyz/yaml-merge:external /buildout/roles/netboot.xyz/defaults/main.yml /buildout/releases.template
+  CURRENTHASH=$(md5sum templateout/roles/netboot.xyz/defaults/main.yml | cut -c1-8)
+  NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
+  # This has allready been pushed just kill off travis build
+  if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
+    exit 1
+  fi
+fi
+
 
 # build the output contents based on build type
 if [ "${TYPE}" == "build" ]; then
@@ -80,6 +93,20 @@ if [ "${TYPE}" == "endpoints" ]; then
   git add endpoints.yml
   git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
   git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
+  git rev-parse HEAD | cut -c1-8 > ../commit.txt
+fi
+
+# commit the new external version upstream to be included in the boot menus
+if [ "${TYPE}" == "releases" ]; then
+  mkdir remote
+  git clone https://github.com/netbootxyz/netboot.xyz.git remote
+  cd remote
+  git checkout -f development
+  cp ../templateout/merged.yml roles/netboot.xyz/defaults/main.yml
+  git add roles/netboot.xyz/defaults/main.yml
+  git commit -m "External Version bump for ${BRANCH} new version string \"${ARG}\" "
+  git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
+  git rev-parse HEAD | cut -c1-8 > ../commit.txt
 fi
 
 # send status to discord
@@ -91,7 +118,7 @@ if [ "${TYPE}" == "discord" ]; then
       "embeds": [
         {
           "color": 1681177,
-          "description": "__**New Asset Published**__ \n**Release:**  https://github.com/'${GITHUB_ENDPOINT}'/releases/tag/'${TRAVIS_TAG}'\n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+          "description": "__**New Asset Published**__ \n**Release:**  https://github.com/'${GITHUB_ENDPOINT}'/releases/tag/'${TRAVIS_TAG}'\n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
         }
       ],
       "username": "Travis CI"
@@ -105,6 +132,32 @@ if [ "${TYPE}" == "discord" ]; then
         {
           "color": 16711680,
           "description": "**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+        }
+      ],
+      "username": "Travis CI"
+    }' \
+    ${DISCORD_HOOK_URL}
+  if [ "${ARG}" == "versiongood" ]; then
+    curl -X POST -H "Content-Type: application/json" --data \
+    '{
+      "avatar_url": "https://avatars.io/twitter/travisci",
+      "embeds": [
+        {
+          "color": 1681177,
+	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+        }
+      ],
+      "username": "Travis CI"
+    }' \
+    ${DISCORD_HOOK_URL}
+  elif [ "${ARG}" == "versionbad" ]; then
+    curl -X POST -H "Content-Type: application/json" --data \
+    '{
+      "avatar_url": "https://avatars.io/twitter/travisci",
+      "embeds": [
+        {
+          "color": 16711680,
+          "description": "**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
         }
       ],
       "username": "Travis CI"
