@@ -137,7 +137,7 @@ if [ "${TYPE}" == "discord" ]; then
       "username": "Travis CI"
     }' \
     ${DISCORD_HOOK_URL}
-  if [ "${ARG}" == "versiongood" ]; then
+  elif [ "${ARG}" == "versiongood" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
       "avatar_url": "https://avatars.io/twitter/travisci",
