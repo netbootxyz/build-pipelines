@@ -14,7 +14,7 @@ ARG="$2"
 if [ "${TYPE}" == "compare" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
   cp endpoints.template templateout/
-  docker run --rm -it -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge
+  docker run --rm -i -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge
   CURRENTHASH=$(md5sum templateout/endpoints.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
@@ -27,7 +27,7 @@ fi
 if [ "${TYPE}" == "versioning" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
   cp releases.template templateout/
-  docker run --rm -it -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge:external /buildout/roles/netbootxyz/defaults/main.yml /buildout/releases.template
+  docker run --rm -i -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge:external /buildout/roles/netbootxyz/defaults/main.yml /buildout/releases.template
   CURRENTHASH=$(md5sum templateout/roles/netbootxyz/defaults/main.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
@@ -43,29 +43,29 @@ if [ "${TYPE}" == "build" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
-    docker run --rm -it -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
+    docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "initrd_layer" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
-    docker run --rm -it -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
+    docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
     sudo docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
-    docker run --rm -it -v $(pwd)/buildout:/buildout files
+    docker run --rm -i -v $(pwd)/buildout:/buildout files
   elif [ "${ARG}" == "custom_kernel" ]; then
     docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t kernel .
     mkdir -p buildout
-    docker run --rm -it -v $(pwd)/buildout:/buildout kernel
+    docker run --rm -i -v $(pwd)/buildout:/buildout kernel
   elif [ "${ARG}" == "initrd_patch" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
-    docker run --rm -it -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
+    docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
     sudo docker build --no-cache -f Dockerfile --build-arg EXTERNAL_VERSION=${EXTERNAL_VERSION} -t files .
-    docker run --rm -it -v $(pwd)/buildout:/buildout files
+    docker run --rm -i -v $(pwd)/buildout:/buildout files
     mv buildout buildin
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
-    docker run --rm -it -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin ghcr.io/netbootxyz/iso-processor
+    docker run --rm -i -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "direct_file" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
@@ -88,7 +88,7 @@ if [ "${TYPE}" == "endpoints" ]; then
   cd remote
   git checkout -f development
   cp endpoints.yml ../templateout/
-  docker run --rm -it -e RELEASE_TAG="NULL" -v $(pwd)/../templateout:/buildout ghcr.io/netbootxyz/yaml-merge
+  docker run --rm -i -e RELEASE_TAG="NULL" -v $(pwd)/../templateout:/buildout ghcr.io/netbootxyz/yaml-merge
   cp ../templateout/merged.yml endpoints.yml
   git add endpoints.yml
   git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
