@@ -92,7 +92,7 @@ if [ "${TYPE}" == "endpoints" ]; then
   cp ../templateout/merged.yml endpoints.yml
   git add endpoints.yml
   git commit -m "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
-  git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
+  git push https://netboot-ci:${CI_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
   git rev-parse HEAD | cut -c1-8 > ../commit.txt
 fi
 
@@ -105,7 +105,7 @@ if [ "${TYPE}" == "releases" ]; then
   cp ../templateout/merged.yml roles/netbootxyz/defaults/main.yml
   git add roles/netbootxyz/defaults/main.yml
   git commit -m "External Version bump for ${BRANCH} new version string \"${ARG}\" "
-  git push https://netboot-ci:${GITHUB_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
+  git push https://netboot-ci:${CI_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
   git rev-parse HEAD | cut -c1-8 > ../commit.txt
 fi
 
