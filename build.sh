@@ -32,8 +32,10 @@ if [ "${TYPE}" == "versioning" ]; then
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
   # This has allready been pushed just kill off travis build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
+    echo "Hash is same, exiting..."
     exit 1
   fi
+  echo "Hash is different.  Continuing..."
 fi
 
 
