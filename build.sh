@@ -114,37 +114,37 @@ if [ "${TYPE}" == "discord" ]; then
   if [ "${ARG}" == "success" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/travisci",
+      "avatar_url": "https://avatars.io/twitter/github",
       "embeds": [
         {
           "color": 1681177,
-          "description": "__**New Asset Published**__ \n**Release:**  https://github.com/'${GITHUB_ENDPOINT}'/releases/tag/'${TRAVIS_TAG}'\n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+          "description": "__**New Asset Published**__ \n**Release:**  https://github.com/'${GITHUB_ENDPOINT}'/releases/tag/'${GITHUB_TAG}'\n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
-      "username": "Travis CI"
+      "username": "Github"
     }' \
     ${DISCORD_HOOK_URL}
   elif [ "${ARG}" == "failure" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/travisci",
+      "avatar_url": "https://avatars.io/twitter/github",
       "embeds": [
         {
           "color": 16711680,
-          "description": "**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+          "description": "**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
-      "username": "Travis CI"
+      "username": "Github"
     }' \
     ${DISCORD_HOOK_URL}
   elif [ "${ARG}" == "versiongood" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/travisci",
+      "avatar_url": "https://avatars.io/twitter/github",
       "embeds": [
         {
           "color": 1681177,
-	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
       "username": "Travis CI"
@@ -153,14 +153,14 @@ if [ "${TYPE}" == "discord" ]; then
   elif [ "${ARG}" == "versionbad" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/travisci",
+      "avatar_url": "https://avatars.io/twitter/github",
       "embeds": [
         {
           "color": 16711680,
-          "description": "**Build:**  '${TRAVIS_BUILD_WEB_URL}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${TRAVIS_COMMIT}'\n"
+          "description": "**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
-      "username": "Travis CI"
+      "username": "Github"
     }' \
     ${DISCORD_HOOK_URL}
   else
