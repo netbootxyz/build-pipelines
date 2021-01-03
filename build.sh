@@ -132,7 +132,7 @@ if [ "${TYPE}" == "discord" ]; then
       "embeds": [
         {
           "color": 16711680,
-          "description": "**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
+          "description": "**Build:**  'https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**External Version:**  '${EXTERNAL_VERSION}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
       "username": "Github"
@@ -145,7 +145,7 @@ if [ "${TYPE}" == "discord" ]; then
       "embeds": [
         {
           "color": 1681177,
-	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
+	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/${GITHUB_REPOSITORY}/commit/'$(cat commit.txt)'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
       "username": "Travis CI"
@@ -158,7 +158,7 @@ if [ "${TYPE}" == "discord" ]; then
       "embeds": [
         {
           "color": 16711680,
-          "description": "**Build:**  'https://github.com/netbootxyz/netboot.xyz/actions/runs/${GITHUB_RUN_ID}'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
+          "description": "**Build:**  'https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**Status:**  Failure\n**Change:** https://github.com/'${GITHUB_ENDPOINT}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
       "username": "Github"
