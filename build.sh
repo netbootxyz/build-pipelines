@@ -17,7 +17,7 @@ if [ "${TYPE}" == "compare" ]; then
   docker run --rm -i -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge
   CURRENTHASH=$(md5sum templateout/endpoints.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
-  # This has allready been pushed just kill off travis build
+  # This has allready been pushed just kill off the build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
     exit 1
   fi
@@ -30,7 +30,7 @@ if [ "${TYPE}" == "versioning" ]; then
   docker run --rm -i -e VERSION="${ARG}" -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge:external /buildout/roles/netbootxyz/defaults/main.yml /buildout/releases.template
   CURRENTHASH=$(md5sum templateout/roles/netbootxyz/defaults/main.yml | cut -c1-8)
   NEWHASH=$(md5sum templateout/merged.yml | cut -c1-8)
-  # This has allready been pushed just kill off travis build
+  # This has allready been pushed just kill off build
   if [[ "${CURRENTHASH}" == "${NEWHASH}" ]]; then
     echo "Hash is same, exiting..."
     exit 1
@@ -115,7 +115,7 @@ if [ "${TYPE}" == "discord" ]; then
   if [ "${ARG}" == "success" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/github",
+      "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
       "embeds": [
         {
           "color": 1681177,
@@ -128,7 +128,7 @@ if [ "${TYPE}" == "discord" ]; then
   elif [ "${ARG}" == "failure" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/github",
+      "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
       "embeds": [
         {
           "color": 16711680,
@@ -141,20 +141,20 @@ if [ "${TYPE}" == "discord" ]; then
   elif [ "${ARG}" == "versiongood" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/github",
+      "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
       "embeds": [
         {
           "color": 1681177,
 	  "description": "__**New Version Detected**__ \n**Version Bump:**  https://github.com/netbootxyz/netboot.xyz/commit/'$(cat commit.txt)'\n**Workflow Name:**  '${GITHUB_WORKFLOW}'\n**Build:**  https://github.com/'${GITHUB_REPOSITORY}'/actions/runs/'${GITHUB_RUN_ID}'\n**Status:**  Success\n**Change:** https://github.com/'${GITHUB_REPOSITORY}'/commit/'${GITHUB_SHA}'\n"
         }
       ],
-      "username": "Travis CI"
+      "username": "Github"
     }' \
     ${DISCORD_HOOK_URL}
   elif [ "${ARG}" == "versionbad" ]; then
     curl -X POST -H "Content-Type: application/json" --data \
     '{
-      "avatar_url": "https://avatars.io/twitter/github",
+      "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
       "embeds": [
         {
           "color": 16711680,
