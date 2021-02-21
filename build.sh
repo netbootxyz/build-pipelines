@@ -48,6 +48,7 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "initrd_layer" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
@@ -59,6 +60,7 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -v $(pwd)/buildout:/buildout kernel
   elif [ "${ARG}" == "initrd_patch" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
@@ -70,6 +72,7 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "direct_file" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
+    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     source settings.sh
     while read -r DL; do
