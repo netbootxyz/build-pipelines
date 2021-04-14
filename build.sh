@@ -9,7 +9,8 @@ fi
 TYPE="$1"
 ARG="$2"
 
-alias dockerRun='docker run --rm -i'
+dockerRun() { docker run --rm -i "$@"; } # Might be missing a sudo?
+dockerRunBuildOut() { dockerRun -v "$(pwd)/buildout:/buildout" "$@"; }
 
 main() {
   case "$TYPE" in
@@ -40,7 +41,6 @@ ReplaceVersion() {
   sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
 }
 BuildImages() {
-  alias dockerRunBuildOut='dockerRun -v $(pwd)/buildout:/buildout'
   case "${ARG}" in
     "iso_extraction")
       ReplaceVersion
@@ -97,13 +97,11 @@ VersionBump() {
       cp endpoints.yml ../templateout/
       docker run --rm -i -e RELEASE_TAG="NULL" -v $(pwd)/../templateout:/buildout ghcr.io/netbootxyz/yaml-merge
       PushMergedToRepo endpoints.yml "Version bump for ${GITHUB_ENDPOINT}:${BRANCH} new tag ${ARG}"
-      ;;
   elif [[ "$type" == "external" ]]; then
       PushChangeToRepo roles/netbootxyz/defaults/main.yml "External Version bump for ${BRANCH} new version string \"${ARG}\" "
-      ;;
   fi
   git push https://netboot-ci:${CI_TOKEN}@github.com/netbootxyz/netboot.xyz.git --all
-  git rev-parse HEAD | cut -c1-8 > ../commit.txt ;;
+  git rev-parse HEAD | cut -c1-8 > ../commit.txt
 }
 
 
@@ -123,7 +121,7 @@ NotifyDiscord() {
       }' \
       ${DISCORD_HOOK_URL}
       ;;
-    "failure" ]; then
+    "failure")
       curl -X POST -H "Content-Type: application/json" --data \
       '{
         "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
@@ -137,7 +135,7 @@ NotifyDiscord() {
       }' \
       ${DISCORD_HOOK_URL}
       ;;
-    "versiongood" ]; then
+    "versiongood")
       curl -X POST -H "Content-Type: application/json" --data \
       '{
         "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
@@ -151,7 +149,7 @@ NotifyDiscord() {
       }' \
       ${DISCORD_HOOK_URL}
       ;;
-    "versionbad" ]; then
+    "versionbad")
       curl -X POST -H "Content-Type: application/json" --data \
       '{
         "avatar_url": "https://api.microlink.io/?url=https://twitter.com/github&embed=image.url",
