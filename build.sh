@@ -13,6 +13,7 @@ ARG="$2"
 # compare external endpoints file to this one after being tagged
 if [ "${TYPE}" == "compare" ]; then
   git clone https://github.com/netbootxyz/netboot.xyz.git -b development templateout
+  sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
   cp endpoints.template templateout/
   docker run --rm -i -e RELEASE_TAG=${ARG} -v $(pwd)/templateout:/buildout ghcr.io/netbootxyz/yaml-merge
   CURRENTHASH=$(md5sum templateout/endpoints.yml | cut -c1-8)
@@ -42,7 +43,6 @@ fi
 if [ "${TYPE}" == "build" ]; then
   if [ "${ARG}" == "iso_extraction" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
-    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
@@ -60,7 +60,6 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -v $(pwd)/buildout:/buildout kernel
   elif [ "${ARG}" == "initrd_patch" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
-    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
@@ -72,7 +71,6 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -e COMPRESS_INITRD="true" -v $(pwd)/buildout:/buildout -v $(pwd)/buildin:/buildin ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "direct_file" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
-    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     source settings.sh
     while read -r DL; do
