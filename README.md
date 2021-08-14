@@ -1,6 +1,6 @@
-- [NETBOOT.XYZ Build Environment](#netbootxyz-build-environment)
+- [netboot.xyz Build Environment](#netbootxyz-build-environment)
   * [Intro](#intro)
-  * [Templating NETBOOT.XYZ](#templating-netbootxyz)
+  * [Templating netboot.xyz](#templating-netbootxyz)
     + [Templating basics](#templating-basics)
     + [Using the templates to self host](#using-the-templates-to-self-host)
   * [Building HTTPS compatible Live CD components](#building-https-compatible-live-cd-components)
@@ -26,9 +26,9 @@ The purpose of this repository is 2 parts:
 
 Outside of the core principles, this document should provide as much possible information on how to properly participate in the project as a whole.
 
-## Templating NETBOOT.XYZ
+## Templating netboot.xyz
 
-Our main visible output is https available customized IPXE Menu assets that can be easily consumed by a series of custom built IPXE boot mediums.
+Our main visible output is https available customized iPXE Menu assets that can be easily consumed by a series of custom built iPXE boot mediums.
 We template the menu output for two reasons as it makes it possible for this project to be updated by bots reaching out for our own custom hosted assets and it also makes it possible for users to locally host their own customized menu/boot medium sets.
 To encapsilate all build steps and menu templating Ansible was selected as a platform using Jinja templates. 
 
@@ -164,7 +164,7 @@ wget -O ."$DLPATH"vmlinuz "$DLURL"vmlinuz
 
 The resulting folder structure can be hosted with Apache, NGINX, or any other webserver and the user can modify the `live_endpoint` in their `boot.cfg` which defaults to `https://github.com/netbootxyz` to their webserver and serve them locally.
 
-This method of self hosting also assumes that the user is either custom building the boot medium and menu files from a webserver or they are serving the IPXE files from TFPT. 
+This method of self hosting also assumes that the user is either custom building the boot medium and menu files from a webserver or they are serving the iPXE files from TFPT. 
 
 ## Building HTTPS compatible Live CD components
 
@@ -229,9 +229,9 @@ Our assumption will always be that the end users want to boot the latest minor v
 
 These builds need to be able to be run daily and handle failure to retrieve the current external version for the releases. Meaning if they get a null response back the null version number should not allow a successful build as a protection from publishing empty/corrupt releases.
 
-The external version checks should be written in bash where possible and compatible with a base configured travis virtual build environment.
+The external version checks should be written in bash where possible and compatible with a base configured Github Actions build environment.
 This logic flow for this daily build process is as follows: 
-* Travis cron job kicks off the build for the branch we have decided to run daily checks for a minor version change
+* Github Actions cron job kicks off the build for the branch we have decided to run daily checks for a minor version change
 * The external verison number is gotten and applied to the endpoints template in the repo
 * The current centralized endpoints template in our main development repo is pulled in and merged with the template from the local repo
 * If the file generated does not match the MD5 of the origional file downloaded then we continue the build process eventually publishing the new asset
@@ -346,7 +346,7 @@ The workflow is as follows:
 * Commits from development are merged into `rc` (these build and push to https://staging.boot.netboot.xyz/rc/) 
 * On final release `rc` is merged into `master` (these build and push to https://boot.netboot.xyz/)
 
-This section only applies to our main project that outputs menu and bootable asset files. The asset repos will generally be managed strictly by NETBOOT.XYZ team members and have a less restrictive workflow.
+This section only applies to our main project that outputs menu and bootable asset files. The asset repos will generally be managed strictly by netboot.xyz team members and have a less restrictive workflow.
 
 ### Hosted fully functional build output
 
@@ -361,14 +361,11 @@ Outside of rolling development output we also want to version control our releas
 
 To access a specific version for example though you would use it's version number IE `https://boot.netboot.xyz/1.05` these endpoints will host menu files and boot medium to use to access them from a client. 
 
-### Continuous integration
+### Continuous Integration
 
 Currently all commits that come from Humans need to come in the form of a pull request to the Development branch and make their way up the chain to a release. 
 
 For a pull request we: 
 
 * Lint all ingested settings and templates with- `ansible-lint -v roles/netbootxyz`
-* Build the IPXE assets and templates with dummy values
-
-Using travis due to the lack of secrets in commit PRs our options for pushing off reports outside of the build context in Travis is limited. 
-In the future if migrating to an alternative platform new options may open up. 
+* Build the iPXE assets and templates with dummy values
