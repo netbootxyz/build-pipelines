@@ -164,7 +164,7 @@ wget -O ."$DLPATH"vmlinuz "$DLURL"vmlinuz
 
 The resulting folder structure can be hosted with Apache, NGINX, or any other webserver and the user can modify the `live_endpoint` in their `boot.cfg` which defaults to `https://github.com/netbootxyz` to their webserver and serve them locally.
 
-This method of self hosting also assumes that the user is either custom building the boot medium and menu files from a webserver or they are serving the iPXE files from TFPT. 
+This method of self hosting also assumes that the user is either custom building the boot medium and menu files from a webserver or they are serving the iPXE files from TFTP. 
 
 ## Building HTTPS compatible Live CD components
 
