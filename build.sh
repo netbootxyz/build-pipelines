@@ -48,7 +48,6 @@ if [ "${TYPE}" == "build" ]; then
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
   elif [ "${ARG}" == "initrd_layer" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
-    sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" endpoints.template
     mkdir -p buildout
     cp settings.sh buildout/settings.sh
     docker run --rm -i -v $(pwd)/buildout:/buildout ghcr.io/netbootxyz/iso-processor
