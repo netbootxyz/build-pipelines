@@ -183,7 +183,7 @@ Next you need the ability to download the SquashFS at boot time in the Initramfs
 
 ### Asset publishing to Github releases
 
-Github allows us to host files up to 2 gigabytes in size and does not have strict limits on the number of files attached to a release. This allows us to download external ISOs and extract their contents in Travis build jobs finishing by uploading the files we need from them to Github Releases.
+Github allows us to host files up to 2 gigabytes in size and does not have strict limits on the number of files attached to a release. This allows us to download external ISOs and extract their contents in Github Actions build jobs finishing by uploading the files we need from them to Github Releases.
 
 Asset repos use near identical logic to pull and publish their components as we have intentionally centralized their build logic in a git based script and download/extraction process to a centralized Docker container. 
 
@@ -342,7 +342,7 @@ Both the RC and main release should contain the same changelog with the squashed
 The workflow is as follows: 
 * User checks out `development`
 * User branches `development` to a feature branch
-* Feature branch Pull requests back into `development` must be approved by at least one team member (these will be built automatically by Travis)
+* Feature branch Pull requests back into `development` must be approved by at least one team member (these will be built automatically by Github Actions)
 * Commits from development are merged into `rc` (these build and push to https://staging.boot.netboot.xyz/rc/) 
 * On final release `rc` is merged into `master` (these build and push to https://boot.netboot.xyz/)
 
