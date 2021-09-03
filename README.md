@@ -14,7 +14,7 @@ Outside of the core principles, this document should provide as much possible in
 
 Our main visible output is https available customized iPXE Menu assets that can be easily consumed by a series of custom built iPXE boot mediums.
 We template the menu output for two reasons as it makes it possible for this project to be updated by bots reaching out for our own custom hosted assets and it also makes it possible for users to locally host their own customized menu/boot medium sets.
-To encapsilate all build steps and menu templating Ansible was selected as a platform using Jinja templates. 
+To encapsulate all build steps and menu templating, Ansible was selected as a platform using Jinja templates. 
 
 The build process should always strive to: 
 
@@ -31,7 +31,7 @@ Templates for boot menus should try to utilize centralized variables from defaul
 
 #### Loop through everything
 
-In general build time optimizations when it comes to templating are not a huge priority. In order to pull out values you want in an ordered list it will sometimes be necesarry to loop through all of the assets available IE for Ubuntu Live CDs: 
+In general build time optimizations when it comes to templating are not a huge priority. In order to pull out values you want in an ordered list it will sometimes be necessary to loop through all of the assets available IE for Ubuntu Live CDs: 
 
 ```
 {% for key, value in endpoints.items() | sort %}
@@ -53,11 +53,11 @@ item ubuntu-18.04-kylin-squash ${space} Ubuntu 18.04 Kylin
 item ubuntu-18.04-xfce-squash ${space} Ubuntu 18.04 Xfce
 ```
 
-By performing loops like this flavors can be added in the future to our asset list without making modifcations to the core template. 
+By performing loops like this, flavors can be added in the future to our asset list without making modifications to the core template. 
 
 #### YAML when possible
 
-When templating the way to bake in user overide ability with minimal effort from users is to store variables in the `defaults/main.yml` file. 
+When templating, the way to bake in user override ability with minimal effort from users is to store variables in the `defaults/main.yml` file. 
 For example looking at OpenBSD:
 
 ```
@@ -119,12 +119,12 @@ If a user wants to prune this completely from their custom built menu or just ad
 Throughout this document you will read about the concept of a centralized list of endpoints, these are specific assets we as a project produce and host out of Github releases.
 Out of everything that is hosted in these menus the contents of Live CDs we tear apart and publish dwarfs them all in size. 
 
-If a user has a need to boot these medium many times either in a local home setup or a full Enterprise enviroment we need to provide the tools to be able to easily mirror our build output and provide options to selectively download only what they choose to show in their menus.
+If a user has a need to boot these medium many times either in a local home setup or a full Enterprise environment we need to provide the tools to be able to easily mirror our build output and provide options to selectively download only what they choose to show in their menus.
 
-At the time of this writing the current menus for the project are a mix of legacy menus for publically available assets at HTTP/HTTPS endpoints and assets that we host ourselves out of Github. The legacy assets are difficult to self host as they would conventionally also require that the user syncs entire mirrors for that distribution. 
+At the time of this writing the current menus for the project are a mix of legacy menus for publicly available assets at HTTP/HTTPS endpoints and assets that we host ourselves out of Github. The legacy assets are difficult to self host as they would conventionally also require that the user syncs entire mirrors for that distribution. 
 The assets we host are a little more static and we specifically store their metadata in a format so they can be downloaded and kept up to date in a scripted manner by the end user if needed.
 
-These two pieces of data for every release can be used to construct URLs for download that will be 1:1 comaptible with our menus: 
+These two pieces of data for every release can be used to construct URLs for download that will be 1:1 compatible with our menus: 
 
 ```
     path: /ubuntu-core-18.04/releases/download/4.15.0.20.23-91c3d317/
@@ -133,8 +133,7 @@ These two pieces of data for every release can be used to construct URLs for dow
     - vmlinuz
 ```
 
-Locally a user should be able to run logic we support for consistent ingestion covered in the [main projects documentation](https://github.com/netbootxyz/netboot.xyz), but below is a basic breakdown. 
-
+Locally a user should be able to run logic we support for consistent ingestion covered in the [main projects documentation](https://github.com/netbootxyz/netboot.xyz), but below is a basic breakdown. 0o\-=\
 
 Given the metadata above the following commands will generate a folder structure and files needed: 
 
@@ -185,7 +184,7 @@ casper/filesystem.squashfs|filesystem.squashfs"
 
 The keyword `REPLACE_VERSION` will be substituted in at build time if the external release is version tracked with daily builds.
 
-At the core of the Asset repo concept and really our build infrastrucure as a whole is an endpoints yaml template: 
+At the core of the Asset repo concept and really our build infrastructure as a whole is an endpoints yaml template: 
 
 ```
 endpoints:
@@ -199,10 +198,9 @@ endpoints:
     kernel: "ubuntu-18.04-live-kernel"
 ```
 
-You will notice this file contains a keyword `REPLACE_RELEASE_NAME` this allows us to substitute in the unique relese name at build time comprised of the external version number and the current commit for that build. These endpoints on release get pushed to our development branch:
+You will notice this file contains a keyword `REPLACE_RELEASE_NAME` this allows us to substitute in the unique release name at build time comprised of the external version number and the current commit for that build. These endpoints on release get pushed to our development branch:
 https://github.com/netbootxyz/netboot.xyz/blob/development/endpoints.yml
 This list of metadata allows us to generate boot menu releases with every incremental change to the underlying assets they point to in Github.  
-
 
 Asset repos fall into two main categories for us from a build pipeline perspective.
 
@@ -216,9 +214,9 @@ These builds need to be able to be run daily and handle failure to retrieve the 
 The external version checks should be written in bash where possible and compatible with a base configured Github Actions build environment.
 This logic flow for this daily build process is as follows: 
 * Github Actions cron job kicks off the build for the branch we have decided to run daily checks for a minor version change
-* The external verison number is gotten and applied to the endpoints template in the repo
+* The external version number is retrieved and applied to the endpoints template in the repo
 * The current centralized endpoints template in our main development repo is pulled in and merged with the template from the local repo
-* If the file generated does not match the MD5 of the origional file downloaded then we continue the build process eventually publishing the new asset
+* If the file generated does not match the MD5 of the original file downloaded then we continue the build process eventually publishing the new asset
 * The new asset being published updates the centralized endpoints and the loop can continue
 
 #### Static builds for non version tracked assets
@@ -226,7 +224,6 @@ This logic flow for this daily build process is as follows:
 For some asset ingestion we can assume that the ISO we download and extract at that version number will be those components as long as the items exist in our boot menus. 
 These can build once and publish to add their metadata to the centralized endpoints and stay put until we make changes to that repo/branch. 
 In the case of static builds effort should still be made to ingest and tag the release with a unique ID for an external marker. Most distros will provide md5sums or sha265sums of their published ISO for verification the first 8 characters of this sha should be a go to to mark the release on Github. 
-
 
 ### Compatibility between standard init hooks and Github releases
 
@@ -309,17 +306,17 @@ All that Manjaro requires is slight code changes to support 302 redirects as the
 	/etc/initcpio/hooks/miso_pxe_http
 ```
 
-For some unknown reason it hangs on the initial file download unless the user continuosly presses CTL+C and CTRL+D. 
+For some unknown reason it hangs on the initial file download unless the user continuously presses CTL+C and CTRL+D. 
 
 #### Red Hat's Dracut
 
 There are many distros that use Dracut as a pre-init manager currently Fedora is the only one we host and provide live booting options for. 
 
-Fedora support redirects, SSL, and do not have files that need to be multiparted so no changes are needed. 
+Fedora support redirects, SSL, and do not have files that need to be multi-parted so no changes are needed. 
 
 ## Development workflow
 
-From 30,000 feet up we as an organization will take our own internal bot commits along with general development and create a snapshot of the rolling release to test in a release canidate. 
+From 30,000 feet up we as an organization will take our own internal bot commits along with general development and create a snapshot of the rolling release to test in a release candidate. 
 These RC endpoints should be generally acceptable for a normal user to consume as long as they understand they might run into bugs and need to report them to us. 
 Both the RC and main release should contain the same changelog with the squashed commit messages that went into that since the last stable release. 
 
@@ -334,14 +331,14 @@ This section only applies to our main project that outputs menu and bootable ass
 
 ### Hosted fully functional build output
 
-Every time a change is made we need to take that incremental change and create useable output hosted in S3 so we know with certainty that it functions before pushing it to our main domain and innevidibly to downstream users domains/local environments. 
+Every time a change is made we need to take that incremental change and create useable output hosted in S3 so we know with certainty that it functions before pushing it to our main domain and inevitably to downstream users domains/local environments. 
 To achieve this we build and push every commit to our development branch and push the boot medium along with the menu files at that commit off to a specific subfolder based on it's commit sha. 
 At build time this boot medium is statically pointed to this S3 folder so they will always point those specific menus at that commit and can be regression tested. 
 
-Outside of rolling development output we also want to version control our release canidates and production releases. Unlike the development releases these version controlled releases can be accessed at a latest style endpoint:
+Outside of rolling development output we also want to version control our release candidates and production releases. Unlike the development releases these version controlled releases can be accessed at a latest style endpoint:
 
 - https://boot.netboot.xyz - for production
-- https://staging.boot.netboot.xyz/rc/ - for release canidates
+- https://staging.boot.netboot.xyz/rc/ - for release candidates
 
 To access a specific version for example though you would use it's version number IE `https://boot.netboot.xyz/1.05` these endpoints will host menu files and boot medium to use to access them from a client. 
 
