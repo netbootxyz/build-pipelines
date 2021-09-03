@@ -1,20 +1,4 @@
-- [netboot.xyz Build Environment](#netbootxyz-build-environment)
-  * [Intro](#intro)
-  * [Templating netboot.xyz](#templating-netbootxyz)
-    + [Templating basics](#templating-basics)
-    + [Using the templates to self host](#using-the-templates-to-self-host)
-  * [Building HTTPS compatible Live CD components](#building-https-compatible-live-cd-components)
-    + [Asset publishing to Github releases](#asset-publishing-to-github-releases)
-      - [Daily builds to check for external version changes](#daily-builds-to-check-for-external-version-changes)
-      - [Static builds for non version tracked assets](#static-builds-for-non-version-tracked-assets)
-    + [Compatibility between standard init hooks and Github releases](#compatibility-between-standard-init-hooks-and-github-releases)
-      - [Ubuntu's Casper](#ubuntu-s-casper)
-      - [Debian's Live-Boot](#debian-s-live-boot)
-      - [Manjaro's miso hooks](#manjaro-s-miso-hooks)
-      - [Red Hat's Dracut](#red-hat-s-dracut)
-  * [Development workflow](#development-workflow)
-    + [Hosted fully functional build output](#hosted-fully-functional-build-output)
-    + [Continuous integration](#continuous-integration)
+# netboot.xyz Build Environment
 
 ## Intro
 
