@@ -41,6 +41,9 @@ fi
 
 # build the output contents based on build type
 if [ "${TYPE}" == "build" ]; then
+  if [ -f "pre-processing.sh" ]; then
+    sudo bash pre-processing.sh
+  fi
   if [ "${ARG}" == "iso_extraction" ]; then
     sed -i "s/REPLACE_VERSION/${EXTERNAL_VERSION}/g" settings.sh
     mkdir -p buildout
